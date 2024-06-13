@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add User</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Library Management</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a class="nav-link" href="addBook.html">Add Book</a></li>
+        <li class="nav-item"><a class="nav-link" href="addUser.html">Add User</a></li>
+        <li class="nav-item"><a class="nav-link" href="borrowBook.html">Borrow Book</a></li>
+        <li class="nav-item"><a class="nav-link" href="returnBook.html">Return Book</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="mt-4">
+      <h2>Add User</h2>
+      <form id="addUserForm">
+        <div class="form-group">
+          <label for="userID">User ID</label>
+          <input type="text" class="form-control" id="userID" name="userID">
+        </div>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" class="form-control" id="name" name="name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" class="form-control" id="email" name="email">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="addUser()">Add User</button>
+      </form>
+      
+      <h2 class="mt-4">Existing Users</h2>
+      <table class="table table-bordered mt-2">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody id="usersList">
+          <!-- Users will be listed here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbyx8J6aRZS_3PpfYlfGeXk9tpK-yXyeNtQajwLuvCq-0wq8lfr3eKkR49avdZVE2FQLqw/exec';
+
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchUsers();
+    });
+
+    function fetchUsers() {
+      fetch(`${apiUrl}?action=listUsers`, { method: 'GET' })
+        .then(response => response.json())
+        .then(data => {
+          const usersList = document.getElementById('usersList');
+          usersList.innerHTML = ''; // Clear the current list
+          data.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${user.userID}</td>
+              <td>${user.name}</td>
+              <td>${user.email}</td>
+            `;
+            usersList.appendChild(row);
+          });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function addUser() {
+      const userID = document.getElementById('userID').value;
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+
+      fetch(`${apiUrl}?action=addUser&userID=${userID}&name=${name}&email=${email}`, { method: 'GET' })
+        .then(response => response.text())
+        .then(data => {
+          alert(data);
+          fetchUsers(); // Refresh the list of users
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
+</body>
+</html>

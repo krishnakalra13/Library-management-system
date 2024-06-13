@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Book</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Library Management</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a class="nav-link" href="addBook.html">Add Book</a></li>
+        <li class="nav-item"><a class="nav-link" href="addUser.html">Add User</a></li>
+        <li class="nav-item"><a class="nav-link" href="borrowBook.html">Borrow Book</a></li>
+        <li class="nav-item"><a class="nav-link" href="returnBook.html">Return Book</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="mt-4">
+      <h2>Add Book</h2>
+      <form id="addBookForm">
+        <div class="form-group">
+          <label for="bookID">Book ID</label>
+          <input type="text" class="form-control" id="bookID" name="bookID">
+        </div>
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" class="form-control" id="title" name="title">
+        </div>
+        <div class="form-group">
+          <label for="author">Author</label>
+          <input type="text" class="form-control" id="author" name="author">
+        </div>
+        <div class="form-group">
+          <label for="copies">Copies</label>
+          <input type="number" class="form-control" id="copies" name="copies">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="addBook()">Add Book</button>
+      </form>
+      
+      <h2 class="mt-4">Existing Books</h2>
+      <table class="table table-bordered mt-2">
+        <thead>
+          <tr>
+            <th>Book ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Copies Available</th>
+            <th>Total Copies</th>
+          </tr>
+        </thead>
+        <tbody id="booksList">
+          <!-- Books will be listed here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbyx8J6aRZS_3PpfYlfGeXk9tpK-yXyeNtQajwLuvCq-0wq8lfr3eKkR49avdZVE2FQLqw/exec';
+
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchBooks();
+    });
+
+    function fetchBooks() {
+      fetch(`${apiUrl}?action=listBooks`, { method: 'GET' })
+        .then(response => response.json())
+        .then(data => {
+          const booksList = document.getElementById('booksList');
+          booksList.innerHTML = ''; // Clear the current list
+          data.forEach(book => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${book.bookID}</td>
+              <td>${book.title}</td>
+              <td>${book.author}</td>
+              <td>${book.copiesAvailable}</td>
+              <td>${book.totalCopies}</td>
+            `;
+            booksList.appendChild(row);
+          });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function addBook() {
+      const bookID = document.getElementById('bookID').value;
+      const title = document.getElementById('title').value;
+      const author = document.getElementById('author').value;
+      const copies = document.getElementById('copies').value;
+
+      fetch(`${apiUrl}?action=addBook&bookID=${bookID}&title=${title}&author=${author}&copies=${copies}`, { method: 'GET' })
+        .then(response => response.text())
+        .then(data => {
+          alert(data);
+          fetchBooks(); // Refresh the list of books
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Return Book</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Library Management</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a class="nav-link" href="addBook.html">Add Book</a></li>
+        <li class="nav-item"><a class="nav-link" href="addUser.html">Add User</a></li>
+        <li class="nav-item"><a class="nav-link" href="borrowBook.html">Borrow Book</a></li>
+        <li class="nav-item"><a class="nav-link" href="returnBook.html">Return Book</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="mt-4">
+      <h2>Return Book</h2>
+      <form id="returnBookForm">
+        <div class="form-group">
+          <label for="borrowID">Borrow ID</label>
+          <select class="form-control" id="borrowID" name="borrowID"></select>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="returnBook()">Return Book</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbyx8J6aRZS_3PpfYlfGeXk9tpK-yXyeNtQajwLuvCq-0wq8lfr3eKkR49avdZVE2FQLqw/exec';
+
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchBorrowedBooks();
+    });
+
+    function fetchBorrowedBooks() {
+      fetch(`${apiUrl}?action=listBorrowedBooks`, { method: 'GET' })
+        .then(response => response.json())
+        .then(data => {
+          const borrowSelect = document.getElementById('borrowID');
+          const borrowedBooks = data.filter(borrow => borrow.returnDate == "");
+
+          borrowedBooks.forEach(borrow => {
+            const option = document.createElement('option');
+            option.value = borrow.borrowID;
+            option.textContent = `Borrow ID: ${borrow.borrowID} - Book ID: ${borrow.bookID} - User ID: ${borrow.userID}`;
+            borrowSelect.appendChild(option);
+          });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function returnBook() {
+      const borrowID = document.getElementById('borrowID').value;
+
+      fetch(`${apiUrl}?action=returnBook&borrowID=${borrowID}`, { method: 'GET' })
+        .then(response => response.text())
+        .then(data => alert(data))
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
+</body>
+</html>

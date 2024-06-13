@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Borrow Book</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Library Management</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a class="nav-link" href="addBook.html">Add Book</a></li>
+        <li class="nav-item"><a class="nav-link" href="addUser.html">Add User</a></li>
+        <li class="nav-item"><a class="nav-link" href="borrowBook.html">Borrow Book</a></li>
+        <li class="nav-item"><a class="nav-link" href="returnBook.html">Return Book</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="mt-4">
+      <h2>Borrow Book</h2>
+      <form id="borrowBookForm">
+        <div class="form-group">
+          <label for="bookIDBorrow">Book ID</label>
+          <select class="form-control" id="bookIDBorrow" name="bookIDBorrow"></select>
+        </div>
+        <div class="form-group">
+          <label for="userIDBorrow">User ID</label>
+          <select class="form-control" id="userIDBorrow" name="userIDBorrow"></select>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="borrowBook()">Borrow Book</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbyx8J6aRZS_3PpfYlfGeXk9tpK-yXyeNtQajwLuvCq-0wq8lfr3eKkR49avdZVE2FQLqw/exec';
+
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchBooks();
+      fetchUsers();
+    });
+
+    function fetchBooks() {
+      fetch(`${apiUrl}?action=listBooks`, { method: 'GET' })
+        .then(response => response.json())
+        .then(data => {
+          const bookSelect = document.getElementById('bookIDBorrow');
+          data.forEach(book => {
+            const option = document.createElement('option');
+            option.value = book.bookID;
+            option.textContent = `${book.title} (${book.bookID})`;
+            bookSelect.appendChild(option);
+          });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function fetchUsers() {
+      fetch(`${apiUrl}?action=listUsers`, { method: 'GET' })
+        .then(response => response.json())
+        .then(data => {
+          const userSelect = document.getElementById('userIDBorrow');
+          data.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.userID;
+            option.textContent = `${user.name} (${user.userID})`;
+            userSelect.appendChild(option);
+          });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function borrowBook() {
+      const bookID = document.getElementById('bookIDBorrow').value;
+      const userID = document.getElementById('userIDBorrow').value;
+
+      fetch(`${apiUrl}?action=borrowBook&bookIDBorrow=${bookID}&userIDBorrow=${userID}`, { method: 'GET' })
+        .then(response => response.text())
+        .then(data => alert(data))
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
+</body>
+</html>
